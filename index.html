@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        #result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 10px;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #667eea;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        /* Tablet Styles (768px and below) */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 30px 25px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 13px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            input[type="number"], select {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 15px;
+            }
+            
+            .price {
+                font-size: 28px;
+            }
+        }
+        
+        /* Mobile Styles (480px and below) */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 22px;
+                margin-bottom: 8px;
+            }
+            
+            .subtitle {
+                font-size: 12px;
+                margin-bottom: 20px;
+            }
+            
+            label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+            
+            input[type="number"], select {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            #result {
+                padding: 15px;
+            }
+            
+            #result h3 {
+                font-size: 16px;
+            }
+            
+            .price {
+                font-size: 24px;
+            }
+        }
+        
+        /* Large Desktop Styles (1200px and above) */
+        @media screen and (min-width: 1200px) {
+            .container {
+                max-width: 700px;
+                padding: 50px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                font-size: 15px;
+            }
+            
+            .form-row {
+                gap: 20px;
+            }
+            
+            input[type="number"], select {
+                padding: 14px 16px;
+                font-size: 16px;
+            }
+            
+            button {
+                padding: 16px;
+                font-size: 17px;
+            }
+            
+            .price {
+                font-size: 36px;
+            }
+        }
+        
+        /* Landscape Mobile Styles */
+        @media screen and (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 10px auto;
+            }
+            
+            h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+            
+            .subtitle {
+                margin-bottom: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 12px;
+            }
+            
+            button {
+                padding: 10px;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 House Price Predictor</h1>
+        <p class="subtitle">Enter the details below to predict the house price</p>
+        
+        <form id="predictForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Area">Area (sq ft):</label>
+                    <input type="number" id="Area" name="Area" required min="0" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="Bedrooms">Bedrooms:</label>
+                    <input type="number" id="Bedrooms" name="Bedrooms" required min="1" max="10" step="1">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Bathrooms">Bathrooms:</label>
+                    <input type="number" id="Bathrooms" name="Bathrooms" required min="1" max="10" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="Floors">Floors:</label>
+                    <input type="number" id="Floors" name="Floors" required min="1" max="5" step="1">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="YearBuilt">Year Built:</label>
+                    <input type="number" id="YearBuilt" name="YearBuilt" required min="1900" max="2025" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="Location">Location:</label>
+                    <select id="Location" name="Location" required>
+                        <option value="">Select Location</option>
+                        <option value="0">Rural</option>
+                        <option value="1">Suburban</option>
+                        <option value="2">Urban</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Condition">Condition:</label>
+                    <select id="Condition" name="Condition" required>
+                        <option value="">Select Condition</option>
+                        <option value="0">Fair</option>
+                        <option value="1">Good</option>
+                        <option value="2">Excellent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="Garage">Garage:</label>
+                    <select id="Garage" name="Garage" required>
+                        <option value="">Has Garage?</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit">Predict Price</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <p>🔄 Calculating price...</p>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = parseFloat(value);
+            });
+            
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            
+            // Show loading
+            loadingDiv.classList.add('show');
+            resultDiv.classList.remove('show');
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Hide loading
+                loadingDiv.classList.remove('show');
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <h3>Predicted House Price</h3>
+                        <div class="price">$${result.prediction.toLocaleString()}</div>
+                    `;
+                    resultDiv.classList.remove('error');
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3>Error</h3>
+                        <p>${result.error || 'An error occurred'}</p>
+                    `;
+                    resultDiv.classList.add('error');
+                }
+                
+                resultDiv.classList.add('show');
+            } catch (error) {
+                loadingDiv.classList.remove('show');
+                resultDiv.innerHTML = `
+                    <h3>Error</h3>
+                    <p>Failed to connect to the server. Make sure the backend is running.</p>
+                `;
+                resultDiv.classList.add('error');
+                resultDiv.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
